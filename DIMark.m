@@ -100,7 +100,7 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
     return oFloat(markBounds.bottomLeft.x + (markBounds.width * cFloat(relativeBlock(val, index))/1000));
   };
   
-  return [self absoluteBlockForProperty:@selector(left) withBlock:absoluteBlock];
+  return [self absoluteBlockForProperty:@selector(left) withBlock:[absoluteBlock copy]];
 }
 
 - (NumberObjBlock)bottomComputed {
@@ -108,7 +108,7 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
     return oFloat(markBounds.bottomLeft.y + (markBounds.height * cFloat(relativeBlock(val, index))/1000));
   };
   
-  return [self absoluteBlockForProperty:@selector(bottom) withBlock:absoluteBlock];
+  return [self absoluteBlockForProperty:@selector(bottom) withBlock:[absoluteBlock copy]];
 }
 
 - (NumberObjBlock)widthComputed {  
@@ -116,7 +116,7 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
     return oFloat(markBounds.width * cFloat(relativeBlock(val, index))/1000);
   };
   
-  return [self absoluteBlockForProperty:@selector(width) withBlock:absoluteBlock];
+  return [self absoluteBlockForProperty:@selector(width) withBlock:[absoluteBlock copy]];
 }
 
 - (NumberObjBlock)heightComputed {
@@ -124,7 +124,7 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
     return oFloat(markBounds.height * cFloat(relativeBlock(val, index))/1000);
   };
   
-  return [self absoluteBlockForProperty:@selector(height) withBlock:absoluteBlock];
+  return [self absoluteBlockForProperty:@selector(height) withBlock:[absoluteBlock copy]];
 }
 
 - (LCRect*)boundsComputed {

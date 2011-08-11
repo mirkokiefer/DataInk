@@ -27,15 +27,15 @@
 @property(readwrite, copy) NumberObjBlock strokeWidth;
 
 @property(readonly) NSArray* dataComputed;
-@property(readonly) NumberObjBlock leftComputed;
-@property(readonly) NumberObjBlock bottomComputed;
-@property(readonly) NumberObjBlock widthComputed;
-@property(readonly) NumberObjBlock heightComputed;
-@property(readonly) TransformObjBlock transformComputed;
+@property(readonly, copy) NumberObjBlock leftComputed;
+@property(readonly, copy) NumberObjBlock bottomComputed;
+@property(readonly, copy) NumberObjBlock widthComputed;
+@property(readonly, copy) NumberObjBlock heightComputed;
+@property(readonly, copy) TransformObjBlock transformComputed;
 
-@property(readonly) ColourObjBlock fillColourComputed;
-@property(readonly) ColourObjBlock strokeColourComputed;
-@property(readonly) NumberObjBlock strokeWidthComputed;
+@property(readonly, copy) ColourObjBlock fillColourComputed;
+@property(readonly, copy) ColourObjBlock strokeColourComputed;
+@property(readonly, copy) NumberObjBlock strokeWidthComputed;
 
 @property(readonly) NSArray* childMarks;
 @property(retain) DIMark* parentMark;

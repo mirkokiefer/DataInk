@@ -12,8 +12,9 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 
 
 @interface DIMark()
-@property(retain) NSMutableArray* _childMarks;
-@property(retain) NSArray* shapeLayers;
+@property(strong) CALayer* _layer;
+@property(strong) NSMutableArray* _childMarks;
+@property(strong) NSArray* shapeLayers;
 @end
 
 @interface DIMark(Private)
@@ -26,14 +27,14 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 @implementation DIMark
 @synthesize data, left, bottom, width, height, transform, parentMark;
 @synthesize strokeColour, fillColour, strokeWidth;
-@synthesize layer, bounds, _childMarks, shapeLayers;
+@synthesize _layer, bounds, _childMarks, shapeLayers;
 
 - (id)init {
   self = [super init];
   if (self) {
     self._childMarks = [NSMutableArray array];
-    self.layer = [CALayer layer];
-    self.layer.delegate = self;
+    self._layer = [CALayer layer];
+    self._layer.delegate = self;
     self.bounds = nil;
     self.shapeLayers = [NSArray array];
   }
@@ -41,10 +42,14 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
   return self;
 }
 
+- (CALayer*)layer {
+  return self._layer;
+}
+
 - (void)add:(DIMark*)childMark {
   [self._childMarks addObject:childMark];
   childMark.parentMark = self;
-  [self.layer addSublayer:childMark.layer];
+  [self._layer addSublayer:childMark.layer];
 }
 
 - (NSArray*)childMarks {
@@ -65,8 +70,8 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 }
 
 - (void)render {
-  self.layer.bounds = self.boundsComputed.cRect;
-  self.layer.position = self.boundsComputed.rectCenter.cPoint;
+  self._layer.bounds = self.boundsComputed.cRect;
+  self._layer.position = self.boundsComputed.rectCenter.cPoint;
   NSArray* shapes = [self shapes];
   [self applyGenericRenderingToShapes:shapes];
   
@@ -75,7 +80,7 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
   }];
   self.shapeLayers = [self layersForShapes:shapes];
   [shapeLayers forEach:^(id each) {
-    [self.layer addSublayer:each];
+    [self._layer addSublayer:each];
     [each setNeedsDisplay];
   }];
   
@@ -83,7 +88,7 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
     DIMark* eachMark = (DIMark*)each;
     [eachMark render];
   }];
-  [self.layer setNeedsDisplay];
+  [self._layer setNeedsDisplay];
 }
 
 - (id)dataComputed {

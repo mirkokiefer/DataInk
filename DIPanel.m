@@ -11,20 +11,7 @@
 @implementation DIPanel
 
 + (id)panel {
-  return [[self alloc] initWithLayer:nil];
-}
-
-+ (id)panelWithLayer:(CALayer*)layer {
-  return [[self alloc] initWithLayer:layer];
-}
-
-- (id)initWithLayer:(CALayer*)aLayer {
-  self = [super init];
-  if (self) {
-    self.layer = aLayer;
-  }
-  
-  return self;
+  return [[self alloc] init];
 }
 
 - (NSArray*)shapes {

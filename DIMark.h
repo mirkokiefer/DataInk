@@ -41,7 +41,7 @@
 @property(retain) DIMark* parentMark;
 @property(readonly) DIPanel* parentPanel;
 
-@property(retain) CALayer* layer;
+@property(strong, readonly) CALayer* layer;
 @property(retain) LCRect* bounds;
 @property(readonly) LCRect* boundsComputed;
 

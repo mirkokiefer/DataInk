@@ -11,6 +11,4 @@
 
 @interface DIPanel : DIMark
 + (id)panel;
-+ (id)panelWithLayer:(CALayer*)layer;
-- (id)initWithLayer:(CALayer*)layer;
 @end

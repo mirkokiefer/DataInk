@@ -15,7 +15,7 @@
 
 
 @interface DIMark : NSObject
-@property(retain) NSArray* data;
+@property(strong) NSArray* data;
 @property(readwrite, copy) NumberObjBlock left;
 @property(readwrite, copy) NumberObjBlock bottom;
 @property(readwrite, copy) NumberObjBlock width;
@@ -42,7 +42,7 @@
 @property(readonly) DIPanel* parentPanel;
 
 @property(strong, readonly) CALayer* layer;
-@property(retain) LCRect* bounds;
+@property(strong) LCRect* bounds;
 @property(readonly) LCRect* boundsComputed;
 
 - (void)add:(DIMark*)childMark;

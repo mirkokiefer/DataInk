@@ -15,6 +15,7 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 @property(strong) CALayer* _layer;
 @property(strong) NSMutableArray* _childMarks;
 @property(strong) NSArray* shapeLayers;
+@property(strong) NSArray* cachedShapes;
 @end
 
 @interface DIMark(Private)
@@ -27,7 +28,7 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 @implementation DIMark
 @synthesize data, left, bottom, width, height, transform, parentMark;
 @synthesize strokeColour, fillColour, strokeWidth;
-@synthesize _layer, bounds, _childMarks, shapeLayers;
+@synthesize _layer, bounds, _childMarks, shapeLayers, cachedShapes;
 
 - (id)init {
   self = [super init];

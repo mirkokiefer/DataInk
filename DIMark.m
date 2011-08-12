@@ -73,13 +73,14 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 - (void)render {
   self._layer.bounds = self.boundsComputed.cRect;
   self._layer.position = self.boundsComputed.rectCenter.cPoint;
-  NSArray* shapes = [self shapes];
-  [self applyGenericRenderingToShapes:shapes];
-  
   [self.shapeLayers forEach:^(id each) {
-    [each removeFromSuperlayer];
+    CALayer* eachLayer = each;
+    [eachLayer removeFromSuperlayer];
+    eachLayer.delegate = nil;
   }];
-  self.shapeLayers = [self layersForShapes:shapes];
+  self.cachedShapes = [self shapes];
+  [self applyGenericRenderingToShapes:self.cachedShapes];
+  self.shapeLayers = [self layersForShapes:self.cachedShapes];
   [shapeLayers forEach:^(id each) {
     [self._layer addSublayer:each];
     [each setNeedsDisplay];

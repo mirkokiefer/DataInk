@@ -53,6 +53,16 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
   [self._layer addSublayer:childMark.layer];
 }
 
+- (void)remove:(DIMark*)childMark {
+  [self._childMarks removeObject:childMark];
+  childMark.parentMark = nil;
+  [childMark.layer removeFromSuperlayer];
+}
+
+- (void)removeFromParentMark {
+  [self.parentMark remove:self];
+}
+
 - (NSArray*)childMarks {
   return [NSArray arrayWithArray: self._childMarks];
 }

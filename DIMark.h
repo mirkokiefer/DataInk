@@ -46,6 +46,8 @@
 @property(readonly) LCRect* boundsComputed;
 
 - (void)add:(DIMark*)childMark;
+- (void)remove:(DIMark*)childMark;
+- (void)removeFromParentMark;
 - (void)render;
 
 - (LCPoint*)topAnchorForShape:(id<LCShape>)shape;

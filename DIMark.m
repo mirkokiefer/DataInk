@@ -27,7 +27,7 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 
 @implementation DIMark
 @synthesize data, left, bottom, width, height, transform, parentMark;
-@synthesize strokeColour, fillColour, strokeWidth;
+@synthesize strokeColour, fillColour, strokeWidth, fillStyle, strokeStyle;
 @synthesize _layer, bounds, _childMarks, shapeLayers, cachedShapes;
 
 - (id)init {
@@ -155,6 +155,15 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
   return [self lookupMarkChainUsingSelector:@selector(strokeColour)];
 }
 
+- (StringObjBlock)fillStyleComputed {
+  return [self lookupMarkChainUsingSelector:@selector(fillStyle)];
+}
+
+- (StringObjBlock)strokeStyleComputed {
+  return [self lookupMarkChainUsingSelector:@selector(strokeStyle)];
+}
+
+
 - (NumberObjBlock)strokeWidthComputed {
   return [self lookupMarkChainUsingSelector:@selector(strokeWidth)];
 }
@@ -211,6 +220,14 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
     }
     if(self.strokeWidthComputed) {
       shape.strokeWidth = cFloat(self.strokeWidthComputed(dataVal, index));
+    }
+    if(self.fillStyleComputed) {
+      NSString* fillSyle = self.fillStyleComputed(dataVal, index);
+      if([fillSyle isEqualToString:@"fill"]) {
+        [shape setDrawModeStrokeFill];
+      } else {
+        [shape setDrawModeStroke];
+      }
     }
     if(self.transformComputed) {
       shape.transform = self.transformComputed(dataVal, index);

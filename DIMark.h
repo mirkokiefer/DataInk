@@ -24,6 +24,8 @@
 
 @property(readwrite, copy) ColourObjBlock fillColour;
 @property(readwrite, copy) ColourObjBlock strokeColour;
+@property(readwrite, copy) StringObjBlock fillStyle;
+@property(readwrite, copy) StringObjBlock strokeStyle;
 @property(readwrite, copy) NumberObjBlock strokeWidth;
 
 @property(readonly) NSArray* dataComputed;
@@ -35,6 +37,8 @@
 
 @property(readonly, copy) ColourObjBlock fillColourComputed;
 @property(readonly, copy) ColourObjBlock strokeColourComputed;
+@property(readonly, copy) StringObjBlock fillStyleComputed;
+@property(readonly, copy) StringObjBlock strokeStyleComputed;
 @property(readonly, copy) NumberObjBlock strokeWidthComputed;
 
 @property(readonly) NSArray* childMarks;

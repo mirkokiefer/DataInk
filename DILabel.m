@@ -16,7 +16,7 @@
 }
 
 - (NumberObjBlock)sizeComputed {
-  LCRect* markBounds = self.boundsComputed;
+  LCRect* markBounds = self.bounds;
   NumberObjBlock absoluteBlock = ^(id val, NSUInteger index) {
     return oFloat(markBounds.height * cFloat(self.size(val, index))/1000);
   };

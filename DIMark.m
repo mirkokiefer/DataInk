@@ -28,13 +28,15 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 @implementation DIMark
 @synthesize data, left, bottom, width, height, transform, parentMark;
 @synthesize strokeColour, fillColour, strokeWidth, fillStyle, strokeStyle;
-@synthesize _layer, bounds, _childMarks, shapeLayers, cachedShapes;
+@synthesize _layer, _childMarks, shapeLayers, cachedShapes;
 
 - (id)init {
   self = [super init];
   if (self) {
     self._childMarks = [NSMutableArray array];
     self._layer = [CALayer layer];
+    self._layer.autoresizingMask = kCALayerMaxXMargin | kCALayerMaxYMargin;
+    self._layer.needsDisplayOnBoundsChange = YES;
     self._layer.delegate = self;
     self.bounds = nil;
     self.shapeLayers = [NSArray array];
@@ -81,8 +83,6 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 }
 
 - (void)render {
-  self._layer.bounds = self.boundsComputed.cRect;
-  self._layer.position = self.boundsComputed.rectCenter.cPoint;
   [self.shapeLayers forEach:^(id each) {
     CALayer* eachLayer = each;
     [eachLayer removeFromSuperlayer];
@@ -101,6 +101,20 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
     [eachMark render];
   }];
   [self._layer setNeedsDisplay];
+}
+
+- (void)setBounds:(LCRect *)bounds {
+  self._layer.bounds = bounds.cRect;
+  self._layer.position = bounds.rectCenter.cPoint;
+}
+
+- (LCRect*)bounds {
+  LCRect* bounds = [LCRect rect:self._layer.bounds];
+  if(bounds.width == 0) {
+    return nil;
+  } else {
+    return bounds;
+  }
 }
 
 - (id)dataComputed {
@@ -137,10 +151,6 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
   };
   
   return [self absoluteBlockForProperty:@selector(height) withBlock:[absoluteBlock copy]];
-}
-
-- (LCRect*)boundsComputed {
-  return [self lookupMarkChainUsingSelector:@selector(bounds)];
 }
 
 - (TransformObjBlock)transformComputed {
@@ -199,7 +209,7 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 - (NumberObjBlock)absoluteBlockForProperty:(SEL)property withBlock:(AbsoluteBlock)block {
   NumberObjBlock relativeBlock = [self lookupMarkChainUsingSelector:property];
   if(relativeBlock) {
-    LCRect* markBounds = self.boundsComputed;
+    LCRect* markBounds = self.bounds;
     NumberObjBlock absoluteBlock = ^(id val, NSUInteger index) {
       return block(val, index, markBounds, relativeBlock);
     };

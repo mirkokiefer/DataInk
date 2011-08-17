@@ -18,11 +18,11 @@
 
 - (NumberObjBlock)radiusComputed {
   CGFloat maxRadius;
-  LCRect* boundsComputed = self.boundsComputed;
-  if(boundsComputed.width > boundsComputed.height) {
-    maxRadius = boundsComputed.height/2;
+  LCRect* layerBounds = self.bounds;
+  if(layerBounds.width > layerBounds.height) {
+    maxRadius = layerBounds.height/2;
   } else {
-    maxRadius = boundsComputed.width/2;
+    maxRadius = layerBounds.width/2;
   }
   NumberObjBlock absoluteBlock = ^(id val, NSUInteger index) {
     return oFloat(maxRadius * cFloat(self.radius(val, index))/1000);

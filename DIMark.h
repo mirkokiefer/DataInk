@@ -47,7 +47,6 @@
 
 @property(strong, readonly) CALayer* layer;
 @property(strong) LCRect* bounds;
-@property(readonly) LCRect* boundsComputed;
 
 - (void)add:(DIMark*)childMark;
 - (void)remove:(DIMark*)childMark;

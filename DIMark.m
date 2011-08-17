@@ -35,10 +35,9 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
   if (self) {
     self._childMarks = [NSMutableArray array];
     self._layer = [CALayer layer];
-    self._layer.autoresizingMask = kCALayerMaxXMargin | kCALayerMaxYMargin;
-    self._layer.needsDisplayOnBoundsChange = YES;
-    self._layer.delegate = self;
-    self.bounds = nil;
+    self.layer.autoresizingMask = kCALayerMaxXMargin | kCALayerMaxYMargin;
+    self.layer.needsDisplayOnBoundsChange = YES;
+    self.layer.delegate = self;
     self.shapeLayers = [NSArray array];
   }
   
@@ -52,6 +51,9 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 - (void)add:(DIMark*)childMark {
   [self._childMarks addObject:childMark];
   childMark.parentMark = self;
+  if(!childMark.bounds) {
+    childMark.bounds = self.bounds;
+  }
   [self._layer addSublayer:childMark.layer];
 }
 
@@ -92,7 +94,7 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
   [self applyGenericRenderingToShapes:self.cachedShapes];
   self.shapeLayers = [self layersForShapes:self.cachedShapes];
   [shapeLayers forEach:^(id each) {
-    [self._layer addSublayer:each];
+    [self.layer addSublayer:each];
     [each setNeedsDisplay];
   }];
   
@@ -100,12 +102,12 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
     DIMark* eachMark = (DIMark*)each;
     [eachMark render];
   }];
-  [self._layer setNeedsDisplay];
+  [self.layer setNeedsDisplay];
 }
 
 - (void)setBounds:(LCRect *)bounds {
-  self._layer.bounds = bounds.cRect;
-  self._layer.position = bounds.rectCenter.cPoint;
+  self.layer.bounds = bounds.cRect;
+  self.layer.position = bounds.rectCenter.cPoint;
 }
 
 - (LCRect*)bounds {

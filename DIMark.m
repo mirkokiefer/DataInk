@@ -29,7 +29,7 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
 @end
 
 @implementation DIMark
-@synthesize data, left, bottom, width, height, transform, parentMark;
+@synthesize data, left, bottom, width, height, transform, parentMark, scale;
 @synthesize strokeColour, fillColour, strokeWidth, fillStyle, strokeStyle;
 @synthesize _layer, _childMarks, shapeLayers, cachedShapes;
 
@@ -41,6 +41,7 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
     self.layer.needsDisplayOnBoundsChange = YES;
     self.layer.delegate = self;
     self.shapeLayers = [NSArray array];
+    self.scale = YES;
   }
   
   return self;
@@ -157,7 +158,12 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
     if(bounds.width == oldBounds.width) {
       eachShape.bounds = [eachShape.bounds offsetX:bounds.x-oldBounds.x y:bounds.y-oldBounds.y];      
     } else {
-      eachShape.bounds = [eachShape.bounds scale:bounds.width/oldBounds.width];
+      CGFloat scaleFactor = bounds.width/oldBounds.width;
+      if(eachShape.scale) {
+        eachShape.bounds = [eachShape.bounds scale:scaleFactor];        
+      } else {
+        eachShape.bounds = [eachShape.bounds offsetFactor:scaleFactor];
+      }
     }
   }];
 }

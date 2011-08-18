@@ -47,6 +47,7 @@
 
 @property(strong, readonly) CALayer* layer;
 @property(strong) LCRect* bounds;
+@property(assign) BOOL scale;
 
 - (void)add:(DIMark*)childMark;
 - (void)addTopLeft:(DIMark*)childMark;

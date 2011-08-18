@@ -1,5 +1,5 @@
 //
-//  DIMark.m
+//  DIShape.m
 //  Wire
 //
 //  Created by Mirko on 7/26/11.
@@ -12,31 +12,31 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 typedef LCRect* (^RectBlock)(LCRect* rect);
 
 
-@interface DIMark()
+@interface DIShape()
 @property(strong) CALayer* _layer;
-@property(strong) NSMutableArray* _childMarks;
+@property(strong) NSMutableArray* _childShapes;
 @property(strong) NSArray* shapeLayers;
 @property(strong) NSArray* cachedShapes;
 @end
 
-@interface DIMark(Private)
+@interface DIShape(Private)
+- (void)addPrivate:(DIShape*)childShape;
+- (void)add:(DIShape*)childShape toAnchorSettingBounds:(RectBlock)block;
 - (NumberObjBlock)absoluteBlockForProperty:(SEL)property withBlock:(AbsoluteBlock)block;
 - (void)applyGenericRenderingToShapes:(NSArray *)shapesArray;
 - (NSArray*)layersForShapes:(NSArray*)shapesArray;
-- (id)lookupMarkChainUsingSelector:(SEL)selector;
-- (void)addPrivate:(DIMark*)childMark;
-- (void)add:(DIMark*)childMark toAnchorSettingBounds:(RectBlock)block;
+- (id)lookupShapeChainUsingSelector:(SEL)selector;
 @end
 
-@implementation DIMark
-@synthesize data, left, bottom, width, height, transform, parentMark, scale;
+@implementation DIShape
+@synthesize data, left, bottom, width, height, transform, parentShape, scale;
 @synthesize strokeColour, fillColour, strokeWidth, fillStyle, strokeStyle;
-@synthesize _layer, _childMarks, shapeLayers, cachedShapes;
+@synthesize _layer, _childShapes, shapeLayers, cachedShapes;
 
 - (id)init {
   self = [super init];
   if (self) {
-    self._childMarks = [NSMutableArray array];
+    self._childShapes = [NSMutableArray array];
     self._layer = [CALayer layer];
     self.layer.needsDisplayOnBoundsChange = YES;
     self.layer.delegate = self;
@@ -51,68 +51,57 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
   return self._layer;
 }
 
-- (void)add:(DIMark*)childMark {
-  [self addPrivate:childMark];
-  if(childMark.bounds.width == 0) {
-    childMark.bounds = self.bounds;
+- (void)add:(DIShape*)childShape {
+  [self addPrivate:childShape];
+  if(childShape.bounds.width == 0) {
+    childShape.bounds = self.bounds;
   }
 }
 
-- (void)addPrivate:(DIMark *)childMark {
-  [self._childMarks addObject:childMark];
-  childMark.parentMark = self;
-  [self._layer addSublayer:childMark.layer];
-}
-
-- (void)add:(DIMark*)childMark toAnchorSettingBounds:(RectBlock)block {
-  [self addPrivate:childMark];
-  childMark.bounds = block(childMark.bounds);
-}
-
-- (void)addTopLeft:(DIMark *)childMark {
+- (void)addTopLeft:(DIShape *)childShape {
   RectBlock setChildBounds = ^LCRect *(LCRect *childBounds) {
     childBounds.bottomRight = self.bounds.topLeft;
     return childBounds;
   };
-  [self add:childMark toAnchorSettingBounds:[setChildBounds copy]];
+  [self add:childShape toAnchorSettingBounds:[setChildBounds copy]];
 }
 
-- (void)addTopRight:(DIMark *)childMark {
+- (void)addTopRight:(DIShape *)childShape {
   RectBlock setChildBounds = ^LCRect *(LCRect *childBounds) {
     childBounds.bottomLeft = self.bounds.topRight;
     return childBounds;
   };
-  [self add:childMark toAnchorSettingBounds:[setChildBounds copy]];
+  [self add:childShape toAnchorSettingBounds:[setChildBounds copy]];
 }
 
-- (void)addBottomLeft:(DIMark *)childMark {
+- (void)addBottomLeft:(DIShape *)childShape {
   RectBlock setChildBounds = ^LCRect *(LCRect *childBounds) {
     childBounds.topRight = self.bounds.bottomLeft;
     return childBounds;
   };
-  [self add:childMark toAnchorSettingBounds:[setChildBounds copy]];
+  [self add:childShape toAnchorSettingBounds:[setChildBounds copy]];
 }
 
-- (void)addBottomRight:(DIMark *)childMark {
+- (void)addBottomRight:(DIShape *)childShape {
   RectBlock setChildBounds = ^LCRect *(LCRect *childBounds) {
     childBounds.topLeft = self.bounds.bottomRight;
     return childBounds;
   };
-  [self add:childMark toAnchorSettingBounds:[setChildBounds copy]];
+  [self add:childShape toAnchorSettingBounds:[setChildBounds copy]];
 }
 
-- (void)remove:(DIMark*)childMark {
-  [self._childMarks removeObject:childMark];
-  childMark.parentMark = nil;
-  [childMark.layer removeFromSuperlayer];
+- (void)remove:(DIShape*)childShape {
+  [self._childShapes removeObject:childShape];
+  childShape.parentShape = nil;
+  [childShape.layer removeFromSuperlayer];
 }
 
-- (void)removeFromParentMark {
-  [self.parentMark remove:self];
+- (void)removeFromParentShape {
+  [self.parentShape remove:self];
 }
 
-- (NSArray*)childMarks {
-  return [NSArray arrayWithArray: self._childMarks];
+- (NSArray*)childShapes {
+  return [NSArray arrayWithArray: self._childShapes];
 }
 
 - (DIPanel*)parentPanel {
@@ -120,9 +109,9 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
   if(self.parentPanel == nil) {
     return (DIPanel*)self;
   }
-  //recurse the parentMarks up until finding a Panel:
-  if([self.parentMark isKindOfClass:[DIPanel class]]) {
-    return (DIPanel*)self.parentMark;
+  //recurse the parentShapes up until finding a Panel:
+  if([self.parentShape isKindOfClass:[DIPanel class]]) {
+    return (DIPanel*)self.parentShape;
   } else {
     return self.parentPanel;
   }
@@ -142,9 +131,9 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
     [each setNeedsDisplay];
   }];
   
-  [self._childMarks forEach:^(id each) {
-    DIMark* eachMark = (DIMark*)each;
-    [eachMark render];
+  [self._childShapes forEach:^(id each) {
+    DIShape* eachShape = (DIShape*)each;
+    [eachShape render];
   }];
   [self.layer setNeedsDisplay];
 }
@@ -153,8 +142,8 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
   LCRect* oldBounds = self.bounds;
   self.layer.bounds = bounds.cRect;
   self.layer.position = bounds.rectCenter.cPoint;
-  [self.childMarks forEach:^(id each) {
-    DIMark* eachShape = each;
+  [self.childShapes forEach:^(id each) {
+    DIShape* eachShape = each;
     if(bounds.width == oldBounds.width) {
       eachShape.bounds = [eachShape.bounds offsetX:bounds.x-oldBounds.x y:bounds.y-oldBounds.y];      
     } else {
@@ -173,69 +162,69 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
 }
 
 - (id)dataComputed {
-  return [self lookupMarkChainUsingSelector:@selector(data)];
+  return [self lookupShapeChainUsingSelector:@selector(data)];
 }
 
 - (NumberObjBlock)leftComputed {
-  AbsoluteBlock absoluteBlock = ^(id val, NSUInteger index, LCRect* markBounds, NumberObjBlock relativeBlock) {
-    return oFloat(markBounds.bottomLeft.x + (markBounds.width * cFloat(relativeBlock(val, index))/1000));
+  AbsoluteBlock absoluteBlock = ^(id val, NSUInteger index, LCRect* shapeBounds, NumberObjBlock relativeBlock) {
+    return oFloat(shapeBounds.bottomLeft.x + (shapeBounds.width * cFloat(relativeBlock(val, index))/1000));
   };
   
   return [self absoluteBlockForProperty:@selector(left) withBlock:[absoluteBlock copy]];
 }
 
 - (NumberObjBlock)bottomComputed {
-  AbsoluteBlock absoluteBlock = ^(id val, NSUInteger index, LCRect* markBounds, NumberObjBlock relativeBlock) {
-    return oFloat(markBounds.bottomLeft.y + (markBounds.height * cFloat(relativeBlock(val, index))/1000));
+  AbsoluteBlock absoluteBlock = ^(id val, NSUInteger index, LCRect* shapeBounds, NumberObjBlock relativeBlock) {
+    return oFloat(shapeBounds.bottomLeft.y + (shapeBounds.height * cFloat(relativeBlock(val, index))/1000));
   };
   
   return [self absoluteBlockForProperty:@selector(bottom) withBlock:[absoluteBlock copy]];
 }
 
 - (NumberObjBlock)widthComputed {  
-  AbsoluteBlock absoluteBlock = ^(id val, NSUInteger index, LCRect* markBounds, NumberObjBlock relativeBlock) {
-    return oFloat(markBounds.width * cFloat(relativeBlock(val, index))/1000);
+  AbsoluteBlock absoluteBlock = ^(id val, NSUInteger index, LCRect* shapeBounds, NumberObjBlock relativeBlock) {
+    return oFloat(shapeBounds.width * cFloat(relativeBlock(val, index))/1000);
   };
   
   return [self absoluteBlockForProperty:@selector(width) withBlock:[absoluteBlock copy]];
 }
 
 - (NumberObjBlock)heightComputed {
-  AbsoluteBlock absoluteBlock = ^(id val, NSUInteger index, LCRect* markBounds, NumberObjBlock relativeBlock) {
-    return oFloat(markBounds.height * cFloat(relativeBlock(val, index))/1000);
+  AbsoluteBlock absoluteBlock = ^(id val, NSUInteger index, LCRect* shapeBounds, NumberObjBlock relativeBlock) {
+    return oFloat(shapeBounds.height * cFloat(relativeBlock(val, index))/1000);
   };
   
   return [self absoluteBlockForProperty:@selector(height) withBlock:[absoluteBlock copy]];
 }
 
 - (TransformObjBlock)transformComputed {
-  return [self lookupMarkChainUsingSelector:@selector(transform)];
+  return [self lookupShapeChainUsingSelector:@selector(transform)];
 }
 
 - (ColourObjBlock)fillColourComputed {
-  return [self lookupMarkChainUsingSelector:@selector(fillColour)];
+  return [self lookupShapeChainUsingSelector:@selector(fillColour)];
 }
 
 - (ColourObjBlock)strokeColourComputed {
-  return [self lookupMarkChainUsingSelector:@selector(strokeColour)];
+  return [self lookupShapeChainUsingSelector:@selector(strokeColour)];
 }
 
 - (StringObjBlock)fillStyleComputed {
-  return [self lookupMarkChainUsingSelector:@selector(fillStyle)];
+  return [self lookupShapeChainUsingSelector:@selector(fillStyle)];
 }
 
 - (StringObjBlock)strokeStyleComputed {
-  return [self lookupMarkChainUsingSelector:@selector(strokeStyle)];
+  return [self lookupShapeChainUsingSelector:@selector(strokeStyle)];
 }
 
 
 - (NumberObjBlock)strokeWidthComputed {
-  return [self lookupMarkChainUsingSelector:@selector(strokeWidth)];
+  return [self lookupShapeChainUsingSelector:@selector(strokeWidth)];
 }
 
 @end
 
-@implementation DIMark(CALayerDelegate)
+@implementation DIShape(CALayerDelegate)
 
 - (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)ctx {
   [self render];
@@ -243,14 +232,25 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
 
 @end
 
-@implementation DIMark(Private)
+@implementation DIShape(Private)
+
+- (void)addPrivate:(DIShape *)childShape {
+  [self._childShapes addObject:childShape];
+  childShape.parentShape = self;
+  [self._layer addSublayer:childShape.layer];
+}
+
+- (void)add:(DIShape*)childShape toAnchorSettingBounds:(RectBlock)block {
+  [self addPrivate:childShape];
+  childShape.bounds = block(childShape.bounds);
+}
 
 - (NumberObjBlock)absoluteBlockForProperty:(SEL)property withBlock:(AbsoluteBlock)block {
-  NumberObjBlock relativeBlock = [self lookupMarkChainUsingSelector:property];
+  NumberObjBlock relativeBlock = [self lookupShapeChainUsingSelector:property];
   if(relativeBlock) {
-    LCRect* markBounds = self.bounds;
+    LCRect* shapeBounds = self.bounds;
     NumberObjBlock absoluteBlock = ^(id val, NSUInteger index) {
-      return block(val, index, markBounds, relativeBlock);
+      return block(val, index, shapeBounds, relativeBlock);
     };
     return absoluteBlock;  
   } else {
@@ -296,13 +296,13 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
   return layers;
 }
 
-- (id)lookupMarkChainUsingSelector:(SEL)selector {
+- (id)lookupShapeChainUsingSelector:(SEL)selector {
   id value = [self performSelector:selector];
   if(value) {
     return value;
   } else {
-    if(self.parentMark && (self.data == nil)) {
-      return [self.parentMark lookupMarkChainUsingSelector:selector];      
+    if(self.parentShape && (self.data == nil)) {
+      return [self.parentShape lookupShapeChainUsingSelector:selector];      
     } else {
       return nil;
     }

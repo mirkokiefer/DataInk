@@ -6,9 +6,9 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "DIMark.h"
+#import "DIShape.h"
 
-@interface DILabel : DIMark
+@interface DILabel : DIShape
 @property(readwrite, copy) StringObjBlock text;
 @property(readwrite, copy) NumberObjBlock size;
 @property(readonly) NumberObjBlock sizeComputed;

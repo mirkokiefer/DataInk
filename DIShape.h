@@ -1,5 +1,5 @@
 //
-//  DIMark.h
+//  DIShape.h
 //  Wire
 //
 //  Created by Mirko on 7/26/11.
@@ -14,7 +14,7 @@
 
 
 
-@interface DIMark : NSObject
+@interface DIShape : NSObject
 @property(strong) NSArray* data;
 @property(readwrite, copy) NumberObjBlock left;
 @property(readwrite, copy) NumberObjBlock bottom;
@@ -41,30 +41,30 @@
 @property(readonly, copy) StringObjBlock strokeStyleComputed;
 @property(readonly, copy) NumberObjBlock strokeWidthComputed;
 
-@property(readonly) NSArray* childMarks;
-@property(retain) DIMark* parentMark;
+@property(readonly) NSArray* childShapes;
+@property(retain) DIShape* parentShape;
 @property(readonly) DIPanel* parentPanel;
 
 @property(strong, readonly) CALayer* layer;
 @property(strong) LCRect* bounds;
 @property(assign) BOOL scale;
 
-- (void)add:(DIMark*)childMark;
-- (void)addTopLeft:(DIMark*)childMark;
-- (void)addTopRight:(DIMark*)childMark;
-- (void)addBottomLeft:(DIMark*)childMark;
-- (void)addBottomRight:(DIMark*)childMark;
-- (void)remove:(DIMark*)childMark;
-- (void)removeFromParentMark;
+- (void)add:(DIShape*)childShape;
+- (void)addTopLeft:(DIShape*)childShape;
+- (void)addTopRight:(DIShape*)childShape;
+- (void)addBottomLeft:(DIShape*)childShape;
+- (void)addBottomRight:(DIShape*)childShape;
+- (void)remove:(DIShape*)childShape;
+- (void)removeFromParentShape;
 - (void)render;
 
 @end
 
-@interface DIMark(Abstract)
+@interface DIShape(Abstract)
 - (NSArray*)shapes;
 - (void)setPositionsForShape:(id<LCShape>)shape inRect:(LCRect*)rect;
 @end
 
-@interface DIMark(CALayerDelegate)
+@interface DIShape(CALayerDelegate)
 - (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)ctx;
 @end

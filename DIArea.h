@@ -6,8 +6,8 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "DIMark.h"
+#import "DIShape.h"
 
-@interface DIArea : DIMark
+@interface DIArea : DIShape
 + (id)area;
 @end

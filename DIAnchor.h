@@ -6,9 +6,9 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "DIMark.h"
+#import "DIShape.h"
 
-@interface DIAnchor : DIMark
+@interface DIAnchor : DIShape
 + left;
 + top;
 + right;

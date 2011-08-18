@@ -7,8 +7,8 @@
 //
 
 
-#import "DIMark.h"
+#import "DIShape.h"
 
-@interface DIPanel : DIMark
+@interface DIPanel : DIShape
 + (id)panel;
 @end

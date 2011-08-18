@@ -6,9 +6,9 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "DIMark.h"
+#import "DIShape.h"
 
-@interface DIDot : DIMark
+@interface DIDot : DIShape
 @property(readwrite, copy) NumberObjBlock size;
 
 + (id)dot;

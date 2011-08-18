@@ -6,9 +6,9 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "DIMark.h"
+#import "DIShape.h"
 
-@interface DIWedge : DIMark
+@interface DIWedge : DIShape
 @property(readwrite, copy) NumberObjBlock startAngle;
 @property(readwrite, copy) NumberObjBlock angle;
 @property(readwrite, copy) NumberObjBlock radius;

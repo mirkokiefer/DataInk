@@ -4,9 +4,9 @@
 
 #import "DataInkStructures.h"
 
-#import "DIMark.h"
+#import "DIShape.h"
 #import "DIPanel.h"
-#import "DIBar.h"
+#import "DIRectangle.h"
 #import "DIDot.h"
 #import "DILabel.h"
 #import "DILine.h"

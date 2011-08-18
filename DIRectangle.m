@@ -1,5 +1,5 @@
 //
-//  DIBar.m
+//  DIRectangle.m
 //  Wire
 //
 //  Created by Mirko on 7/26/11.
@@ -8,15 +8,15 @@
 
 #import "DataInk.h"
 
-@implementation DIBar
+@implementation DIRectangle
 
-+ (id)bar {
++ (id)rectangle {
   return [[self alloc] init];
 }
 
 @end
 
-@implementation DIBar(Abstract)
+@implementation DIRectangle(Abstract)
 
 - (NSArray*)shapes {
   NSArray* rectangles = [self.dataComputed collectIndexed:^id(id each, NSUInteger index) {

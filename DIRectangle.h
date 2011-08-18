@@ -1,14 +1,14 @@
 //
-//  DIBar.h
+//  DIRectangle.h
 //  Wire
 //
 //  Created by Mirko on 7/26/11.
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "DIMark.h"
+#import "DIShape.h"
 
-@interface DIBar : DIMark
+@interface DIRectangle : DIShape
 
-+ (id)bar;
++ (id)rectangle;
 @end

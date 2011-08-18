@@ -49,14 +49,13 @@
 @property(strong) LCRect* bounds;
 
 - (void)add:(DIMark*)childMark;
+- (void)addTopLeft:(DIMark*)childMark;
+- (void)addTopRight:(DIMark*)childMark;
+- (void)addBottomLeft:(DIMark*)childMark;
+- (void)addBottomRight:(DIMark*)childMark;
 - (void)remove:(DIMark*)childMark;
 - (void)removeFromParentMark;
 - (void)render;
-
-- (LCPoint*)topAnchorForShape:(id<LCShape>)shape;
-- (LCPoint*)leftAnchorForShape:(id<LCShape>)shape;
-- (LCPoint*)rightAnchorForShape:(id<LCShape>)shape;
-- (LCPoint*)bottomAnchorForShape:(id<LCShape>)shape;
 
 @end
 

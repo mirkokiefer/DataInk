@@ -23,6 +23,7 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 - (void)applyGenericRenderingToShapes:(NSArray *)shapesArray;
 - (NSArray*)layersForShapes:(NSArray*)shapesArray;
 - (id)lookupMarkChainUsingSelector:(SEL)selector;
+- (void)addPrivate:(DIMark*)childMark;
 @end
 
 @implementation DIMark
@@ -48,12 +49,44 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 }
 
 - (void)add:(DIMark*)childMark {
-  [self._childMarks addObject:childMark];
-  childMark.parentMark = self;
-  if(!childMark.bounds) {
+  [self addPrivate:childMark];
+  if(childMark.bounds.width == 0) {
     childMark.bounds = self.bounds;
   }
+}
+
+- (void)addPrivate:(DIMark *)childMark {
+  [self._childMarks addObject:childMark];
+  childMark.parentMark = self;
   [self._layer addSublayer:childMark.layer];
+}
+
+- (void)addTopLeft:(DIMark *)childMark {
+  [self addPrivate:childMark];
+  LCRect* childBounds = childMark.bounds;
+  childBounds.bottomLeft = self.bounds.topLeft;
+  childMark.bounds = childBounds;
+}
+
+- (void)addTopRight:(DIMark *)childMark {
+  [self addPrivate:childMark];
+  LCRect* childBounds = childMark.bounds;
+  childBounds.bottomLeft = self.bounds.topRight;
+  childMark.bounds = childBounds;
+}
+
+- (void)addBottomLeft:(DIMark *)childMark {
+  [self addPrivate:childMark];
+  LCRect* childBounds = childMark.bounds;
+  childBounds.bottomLeft = self.bounds.bottomLeft;
+  childMark.bounds = childBounds;
+}
+
+- (void)addBottomRight:(DIMark *)childMark {
+  [self addPrivate:childMark];
+  LCRect* childBounds = childMark.bounds;
+  childBounds.bottomLeft = self.bounds.bottomRight;
+  childMark.bounds = childBounds;
 }
 
 - (void)remove:(DIMark*)childMark {
@@ -119,12 +152,7 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 }
 
 - (LCRect*)bounds {
-  LCRect* bounds = [LCRect rect:self._layer.bounds];
-  if(bounds.width == 0) {
-    return nil;
-  } else {
-    return bounds;
-  }
+  return [LCRect rect:self._layer.bounds];
 }
 
 - (id)dataComputed {
@@ -186,22 +214,6 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 
 - (NumberObjBlock)strokeWidthComputed {
   return [self lookupMarkChainUsingSelector:@selector(strokeWidth)];
-}
-
-- (LCPoint*)topAnchorForShape:(id<LCShape>)shape {
-  return shape.boundingBox.topCenter;
-}
-
-- (LCPoint*)leftAnchorForShape:(id<LCShape>)shape {
-  return shape.boundingBox.leftCenter;
-}
-
-- (LCPoint*)rightAnchorForShape:(id<LCShape>)shape {
-  return shape.boundingBox.rightCenter;
-}
-
-- (LCPoint*)bottomAnchorForShape:(id<LCShape>)shape {
-  return shape.boundingBox.bottomCenter;
 }
 
 @end

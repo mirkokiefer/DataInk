@@ -11,4 +11,5 @@
 @interface DIRectangle : DIShape
 
 + (id)rectangle;
++ (id)rectangle:(LCRectangle*)rectangle;
 @end

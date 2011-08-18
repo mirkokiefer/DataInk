@@ -61,32 +61,27 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
   [self._layer addSublayer:childMark.layer];
 }
 
-- (void)addTopLeft:(DIMark *)childMark {
+- (void)addShape:(DIMark*)childMark toAnchor:(SEL)anchor {
   [self addPrivate:childMark];
   LCRect* childBounds = childMark.bounds;
-  childBounds.bottomLeft = self.bounds.topLeft;
+  childBounds.bottomLeft = [self.bounds performSelector:anchor];
   childMark.bounds = childBounds;
+}
+
+- (void)addTopLeft:(DIMark *)childMark {
+  [self addShape:childMark toAnchor:@selector(topLeft)];
 }
 
 - (void)addTopRight:(DIMark *)childMark {
-  [self addPrivate:childMark];
-  LCRect* childBounds = childMark.bounds;
-  childBounds.bottomLeft = self.bounds.topRight;
-  childMark.bounds = childBounds;
+  [self addShape:childMark toAnchor:@selector(topRight)];
 }
 
 - (void)addBottomLeft:(DIMark *)childMark {
-  [self addPrivate:childMark];
-  LCRect* childBounds = childMark.bounds;
-  childBounds.bottomLeft = self.bounds.bottomLeft;
-  childMark.bounds = childBounds;
+  [self addShape:childMark toAnchor:@selector(bottomLeft)];
 }
 
 - (void)addBottomRight:(DIMark *)childMark {
-  [self addPrivate:childMark];
-  LCRect* childBounds = childMark.bounds;
-  childBounds.bottomLeft = self.bounds.bottomRight;
-  childMark.bounds = childBounds;
+  [self addShape:childMark toAnchor:@selector(bottomRight)];
 }
 
 - (void)remove:(DIMark*)childMark {

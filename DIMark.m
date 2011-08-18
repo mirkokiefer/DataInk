@@ -9,6 +9,7 @@
 #import "DataInk.h"
 
 typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, NumberObjBlock block);
+typedef LCRect* (^RectBlock)(LCRect* rect);
 
 
 @interface DIMark()
@@ -24,6 +25,7 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
 - (NSArray*)layersForShapes:(NSArray*)shapesArray;
 - (id)lookupMarkChainUsingSelector:(SEL)selector;
 - (void)addPrivate:(DIMark*)childMark;
+- (void)add:(DIMark*)childMark toAnchorSettingBounds:(RectBlock)block;
 @end
 
 @implementation DIMark
@@ -61,27 +63,41 @@ typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, Numb
   [self._layer addSublayer:childMark.layer];
 }
 
-- (void)addShape:(DIMark*)childMark toAnchor:(SEL)anchor {
+- (void)add:(DIMark*)childMark toAnchorSettingBounds:(RectBlock)block {
   [self addPrivate:childMark];
-  LCRect* childBounds = childMark.bounds;
-  childBounds.bottomLeft = [self.bounds performSelector:anchor];
-  childMark.bounds = childBounds;
+  childMark.bounds = block(childMark.bounds);
 }
 
 - (void)addTopLeft:(DIMark *)childMark {
-  [self addShape:childMark toAnchor:@selector(topLeft)];
+  RectBlock setChildBounds = ^LCRect *(LCRect *childBounds) {
+    childBounds.bottomRight = self.bounds.topLeft;
+    return childBounds;
+  };
+  [self add:childMark toAnchorSettingBounds:[setChildBounds copy]];
 }
 
 - (void)addTopRight:(DIMark *)childMark {
-  [self addShape:childMark toAnchor:@selector(topRight)];
+  RectBlock setChildBounds = ^LCRect *(LCRect *childBounds) {
+    childBounds.bottomLeft = self.bounds.topRight;
+    return childBounds;
+  };
+  [self add:childMark toAnchorSettingBounds:[setChildBounds copy]];
 }
 
 - (void)addBottomLeft:(DIMark *)childMark {
-  [self addShape:childMark toAnchor:@selector(bottomLeft)];
+  RectBlock setChildBounds = ^LCRect *(LCRect *childBounds) {
+    childBounds.topRight = self.bounds.bottomLeft;
+    return childBounds;
+  };
+  [self add:childMark toAnchorSettingBounds:[setChildBounds copy]];
 }
 
 - (void)addBottomRight:(DIMark *)childMark {
-  [self addShape:childMark toAnchor:@selector(bottomRight)];
+  RectBlock setChildBounds = ^LCRect *(LCRect *childBounds) {
+    childBounds.topLeft = self.bounds.bottomRight;
+    return childBounds;
+  };
+  [self add:childMark toAnchorSettingBounds:[setChildBounds copy]];
 }
 
 - (void)remove:(DIMark*)childMark {

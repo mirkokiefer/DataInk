@@ -12,3 +12,4 @@ typedef NSNumber* (^NumberObjBlock)(id each, NSUInteger index);
 typedef LCColour* (^ColourObjBlock)(id each, NSUInteger index);
 typedef LCAffineTransform* (^TransformObjBlock)(id each, NSUInteger index);
 typedef NSString* (^StringObjBlock)(id each, NSUInteger index);
+typedef SEL (^SELObjBlock)(id each, NSUInteger index);

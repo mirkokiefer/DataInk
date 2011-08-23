@@ -30,7 +30,7 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
 
 @implementation DIShape
 @synthesize data, left, bottom, width, height, transform, parentShape, scale;
-@synthesize strokeColour, fillColour, strokeWidth, fillStyle, strokeStyle;
+@synthesize strokeColour, fillColour, strokeWidth, drawMode, strokeStyle;
 @synthesize _layer, _childShapes, shapeLayers, cachedShapes;
 
 - (id)init {
@@ -209,8 +209,8 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
   return [self lookupShapeChainUsingSelector:@selector(strokeColour)];
 }
 
-- (StringObjBlock)fillStyleComputed {
-  return [self lookupShapeChainUsingSelector:@selector(fillStyle)];
+- (StringObjBlock)drawModeComputed {
+  return [self lookupShapeChainUsingSelector:@selector(drawMode)];
 }
 
 - (StringObjBlock)strokeStyleComputed {
@@ -270,13 +270,22 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
     if(self.strokeWidthComputed) {
       shape.strokeWidth = cFloat(self.strokeWidthComputed(dataVal, index));
     }
-    if(self.fillStyleComputed) {
-      NSString* fillSyle = self.fillStyleComputed(dataVal, index);
-      if([fillSyle isEqualToString:@"fill"]) {
+    if(self.drawModeComputed) {
+      NSString* shapeDrawMode = self.drawModeComputed(dataVal, index);
+      LCMatch* match = [LCMatch match];
+      [match on:@"strokeFill" do:^id() {
         [shape setDrawModeStrokeFill];
-      } else {
+        return LCYes;
+      }];
+      [match on:@"stroke" do:^id() {
         [shape setDrawModeStroke];
-      }
+        return LCYes;
+      }];
+      [match on:@"fill" do:^id() {
+        [shape setDrawModeFill];
+        return LCYes;
+      }];
+      [match match:shapeDrawMode];
     }
     if(self.transformComputed) {
       shape.transform = self.transformComputed(dataVal, index);

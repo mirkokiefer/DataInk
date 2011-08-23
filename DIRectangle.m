@@ -40,8 +40,19 @@
   newObj.strokeWidth = ^(id val, NSUInteger index) {
     return oFloat(aRectangle.strokeWidth);
   };
-  newObj.fillStyle = ^(id val, NSUInteger index) {
+  LCMatch* matchDrawMode = [LCMatch match];
+  [matchDrawMode on:@"setDrawModeStroke" do:^id() {
     return @"stroke";
+  }];
+  [matchDrawMode on:@"setDrawModeFill" do:^id() {
+    return @"fill";
+  }];
+  [matchDrawMode on:@"setDrawModeStrokeFill" do:^id() {
+    return @"strokeFill";
+  }];
+  NSString* drawMode = [matchDrawMode match:NSStringFromSelector(aRectangle.drawMode)];
+  newObj.drawMode = ^(id val, NSUInteger index) {
+    return drawMode;
   };
   return newObj;
 }

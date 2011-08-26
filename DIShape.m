@@ -319,3 +319,32 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
 }
 
 @end
+
+@implementation DIShape(Convenience)
+
+- (NSArray*)deepChildShapes {
+  NSMutableArray* children = [NSMutableArray array];
+  [children addObjectsFromArray:self.childShapes];
+  [self.childShapes forEach:^(id each) {
+    [children addObjectsFromArray:[each deepChildShapes]];
+  }];
+  return children;
+}
+
+- (DIShape *)subShapeForLayer:(CALayer *)layer {
+  NSArray* matchedShapes = [[self deepChildShapes] filter:^BOOL(id each) {
+    DIShape* eachShape = each;
+    if([eachShape.layer isEqual:layer]) {
+      return YES;
+    } else {
+      return NO;
+    }
+  }];
+  if([matchedShapes count] > 0) {
+    return [matchedShapes objectAtIndex:0];
+  } else {
+    return nil;
+  }
+}
+
+@end

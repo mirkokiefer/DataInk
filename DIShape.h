@@ -68,3 +68,8 @@
 @interface DIShape(CALayerDelegate)
 - (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)ctx;
 @end
+
+@interface DIShape(Convenience)
+- (NSArray*)deepChildShapes;
+- (DIShape*)subShapeForLayer:(CALayer*)layer;
+@end

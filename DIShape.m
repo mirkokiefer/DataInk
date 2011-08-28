@@ -16,7 +16,7 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
 @property(strong) NSMutableArray* _childShapes;
 @property(strong) NSArray* shapeLayers;
 @property(strong) NSArray* cachedShapes;
-@property(strong) DIAnchor* anchor;
+@property(strong) LCAnchor* anchor;
 @end
 
 @interface DIShape(Private)
@@ -57,7 +57,7 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
   }
 }
 
-- (void)add:(DIShape *)childShape at:(DIAnchor *)anAnchor {
+- (void)add:(DIShape *)childShape at:(LCAnchor *)anAnchor {
   [self addPrivate:childShape];
   childShape.anchor = anAnchor;
   childShape.bounds = [anAnchor position:childShape.bounds in:self.bounds];

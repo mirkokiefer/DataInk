@@ -15,3 +15,8 @@
 #import "DIWedge.h"
 
 #import "DIRange.h"
+#import "DIAnchor.h"
+#import "DITopLeft.h"
+#import "DITopRight.h"
+#import "DIBottomLeft.h"
+#import "DIBottomRight.h"

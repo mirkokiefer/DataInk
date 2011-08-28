@@ -10,7 +10,7 @@
 #import "ObjectiveGraphics.h"
 #import "DataInkStructures.h"
 
-@class DIPanel;
+@class DIPanel, DIAnchor;
 
 
 
@@ -50,10 +50,7 @@
 @property(assign) BOOL scale;
 
 - (void)add:(DIShape*)childShape;
-- (void)addTopLeft:(DIShape*)childShape;
-- (void)addTopRight:(DIShape*)childShape;
-- (void)addBottomLeft:(DIShape*)childShape;
-- (void)addBottomRight:(DIShape*)childShape;
+- (void)add:(DIShape*)childShape at:(DIAnchor*)anchor;
 - (void)remove:(DIShape*)childShape;
 - (void)removeFromParentShape;
 - (void)render;

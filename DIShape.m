@@ -11,17 +11,16 @@
 typedef NSNumber* (^AbsoluteBlock)(id each, NSUInteger index, LCRect* rect, NumberObjBlock block);
 typedef LCRect* (^RectBlock)(LCRect* rect);
 
-
 @interface DIShape()
 @property(strong) CALayer* _layer;
 @property(strong) NSMutableArray* _childShapes;
 @property(strong) NSArray* shapeLayers;
 @property(strong) NSArray* cachedShapes;
+@property(strong) DIAnchor* anchor;
 @end
 
 @interface DIShape(Private)
 - (void)addPrivate:(DIShape*)childShape;
-- (void)add:(DIShape*)childShape toAnchorSettingBounds:(RectBlock)block;
 - (NumberObjBlock)absoluteBlockForProperty:(SEL)property withBlock:(AbsoluteBlock)block;
 - (void)applyGenericRenderingToShapes:(NSArray *)shapesArray;
 - (NSArray*)layersForShapes:(NSArray*)shapesArray;
@@ -31,7 +30,7 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
 @implementation DIShape
 @synthesize data, left, bottom, width, height, transform, parentShape, scale;
 @synthesize strokeColour, fillColour, strokeWidth, drawMode, strokeStyle;
-@synthesize _layer, _childShapes, shapeLayers, cachedShapes;
+@synthesize _layer, _childShapes, shapeLayers, cachedShapes, anchor;
 
 - (id)init {
   self = [super init];
@@ -58,36 +57,10 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
   }
 }
 
-- (void)addTopLeft:(DIShape *)childShape {
-  RectBlock setChildBounds = ^LCRect *(LCRect *childBounds) {
-    childBounds.bottomRight = self.bounds.topLeft;
-    return childBounds;
-  };
-  [self add:childShape toAnchorSettingBounds:[setChildBounds copy]];
-}
-
-- (void)addTopRight:(DIShape *)childShape {
-  RectBlock setChildBounds = ^LCRect *(LCRect *childBounds) {
-    childBounds.bottomLeft = self.bounds.topRight;
-    return childBounds;
-  };
-  [self add:childShape toAnchorSettingBounds:[setChildBounds copy]];
-}
-
-- (void)addBottomLeft:(DIShape *)childShape {
-  RectBlock setChildBounds = ^LCRect *(LCRect *childBounds) {
-    childBounds.topRight = self.bounds.bottomLeft;
-    return childBounds;
-  };
-  [self add:childShape toAnchorSettingBounds:[setChildBounds copy]];
-}
-
-- (void)addBottomRight:(DIShape *)childShape {
-  RectBlock setChildBounds = ^LCRect *(LCRect *childBounds) {
-    childBounds.topLeft = self.bounds.bottomRight;
-    return childBounds;
-  };
-  [self add:childShape toAnchorSettingBounds:[setChildBounds copy]];
+- (void)add:(DIShape *)childShape at:(DIAnchor *)anAnchor {
+  [self addPrivate:childShape];
+  childShape.anchor = anAnchor;
+  childShape.bounds = [anAnchor position:childShape.bounds in:self.bounds];
 }
 
 - (void)remove:(DIShape*)childShape {
@@ -144,14 +117,20 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
   self.layer.position = bounds.rectCenter.cPoint;
   [self.childShapes forEach:^(id each) {
     DIShape* eachShape = each;
-    if(bounds.width == oldBounds.width) {
+    if((bounds.width == oldBounds.width) && (bounds.height == oldBounds.height)) {
       eachShape.bounds = [eachShape.bounds offsetX:bounds.x-oldBounds.x y:bounds.y-oldBounds.y];      
     } else {
-      CGFloat scaleFactor = bounds.width/oldBounds.width;
+      CGFloat widthScaleFactor = bounds.width/oldBounds.width;
+      CGFloat heightScaleFactor = bounds.height/oldBounds.height;
+      CGFloat xOffsetFactor = bounds.bottomLeft.x/oldBounds.bottomLeft.x;
+      CGFloat yOffsetFactor = bounds.bottomLeft.y/oldBounds.bottomLeft.y;
       if(eachShape.scale) {
-        eachShape.bounds = [eachShape.bounds scale:scaleFactor];        
+        LCRect* newBounds = [eachShape.bounds scaleInPositionWidth:widthScaleFactor height:heightScaleFactor];
+        [newBounds offsetFactorX:xOffsetFactor y:yOffsetFactor];
+        eachShape.bounds = newBounds;
       } else {
-        eachShape.bounds = [eachShape.bounds offsetFactor:scaleFactor];
+        LCRect* newBounds = [eachShape.bounds offsetFactorX:xOffsetFactor y:yOffsetFactor];
+        eachShape.bounds = newBounds;
       }
     }
   }];
@@ -238,11 +217,6 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
   [self._childShapes addObject:childShape];
   childShape.parentShape = self;
   [self._layer addSublayer:childShape.layer];
-}
-
-- (void)add:(DIShape*)childShape toAnchorSettingBounds:(RectBlock)block {
-  [self addPrivate:childShape];
-  childShape.bounds = block(childShape.bounds);
 }
 
 - (NumberObjBlock)absoluteBlockForProperty:(SEL)property withBlock:(AbsoluteBlock)block {

@@ -122,16 +122,16 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
     } else {
       CGFloat widthScaleFactor = bounds.width/oldBounds.width;
       CGFloat heightScaleFactor = bounds.height/oldBounds.height;
-      CGFloat xOffsetFactor = bounds.bottomLeft.x/oldBounds.bottomLeft.x;
-      CGFloat yOffsetFactor = bounds.bottomLeft.y/oldBounds.bottomLeft.y;
+      LCRect* newChildBounds = eachShape.bounds;
       if(eachShape.scale) {
-        LCRect* newBounds = [eachShape.bounds scaleInPositionWidth:widthScaleFactor height:heightScaleFactor];
-        [newBounds offsetFactorX:xOffsetFactor y:yOffsetFactor];
-        eachShape.bounds = newBounds;
-      } else {
-        LCRect* newBounds = [eachShape.bounds offsetFactorX:xOffsetFactor y:yOffsetFactor];
-        eachShape.bounds = newBounds;
+        newChildBounds = [newChildBounds scaleInPositionWidth:widthScaleFactor height:heightScaleFactor];
       }
+      if(eachShape.anchor) {
+        newChildBounds = [eachShape.anchor position:newChildBounds in:bounds];
+      } else {
+        newChildBounds = [newChildBounds offsetFactorX:widthScaleFactor y:heightScaleFactor];
+      }
+      eachShape.bounds = newChildBounds;
     }
   }];
 }

@@ -48,6 +48,7 @@
 @property(strong, readonly) CALayer* layer;
 @property(strong) LCRect* bounds;
 @property(assign) BOOL scale;
+@property(strong) LCAnchor* anchor;
 
 - (void)add:(DIShape*)childShape;
 - (void)add:(DIShape*)childShape at:(LCAnchor*)anchor;

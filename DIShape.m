@@ -16,7 +16,6 @@ typedef LCRect* (^RectBlock)(LCRect* rect);
 @property(strong) NSMutableArray* _childShapes;
 @property(strong) NSArray* shapeLayers;
 @property(strong) NSArray* cachedShapes;
-@property(strong) LCAnchor* anchor;
 @end
 
 @interface DIShape(Private)
